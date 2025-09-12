@@ -1,11 +1,7 @@
 import express from "express";
 const router = express.Router();
 import Usercontroller from "../controller/user-controller.js";
-import userUpload from "../middleware/multer.js";
 import { isAuthenticated } from "../middleware/isAuthenticated.js";
-import ContactController from '../controller/contact-controller.js'
-import { verifyResetToken } from "../middleware/verifyResettoken.js";
-import { isAdmin } from "../middleware/isAdmin.js";
 // Create (Register)
 router.post('/signup', userUpload, Usercontroller.signup);
 

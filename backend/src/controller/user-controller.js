@@ -1,7 +1,6 @@
 import UserService from "../services/user-service.js";
 
 const userservice = new UserService();
-import { uploadToCloudinary } from "../utils/cloudinary.js";
 const getAll = async (req, res) => {
     try {
         const users = await userservice.getAll();
@@ -19,13 +18,9 @@ const getAll = async (req, res) => {
 
 const signup = async (req, res) => {
     try {
-        const { body, files } = req;
-        const photoUpload = await uploadToCloudinary(files.photo[0].buffer, 'users/photos');
-        const signatureUpload = await uploadToCloudinary(files.signature[0].buffer, 'users/signatures');
+        const { body } = req;
         const user = await userservice.signup({
             ...body,
-            photoUrl: photoUpload.secure_url,
-            signatureUrl: signatureUpload.secure_url
         });
         return res.status(200).json({
             data: user,
