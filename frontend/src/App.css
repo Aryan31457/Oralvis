@@ -1,0 +1,218 @@
+/* Login/Signup UI styles matching home page */
+.auth-container {
+  max-width: 400px;
+  margin: 60px auto;
+  background: #fff;
+  padding: 32px 24px;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(25,118,210,0.10);
+  text-align: center;
+}
+.auth-container h2 {
+  color: #1976d2;
+  margin-bottom: 24px;
+  font-size: 2em;
+  font-weight: 700;
+}
+.auth-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.auth-container input, .auth-container select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #90caf9;
+  font-size: 1em;
+  margin-bottom: 8px;
+}
+.auth-container button[type="submit"] {
+  background: linear-gradient(90deg, #1976d2 60%, #64b5f6 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 36px;
+  font-size: 1.1em;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.auth-container button[type="submit"]:hover {
+  background: linear-gradient(90deg, #1565c0 60%, #42a5f5 100%);
+  transform: scale(1.04);
+}
+.auth-container .error-msg {
+  color: #d32f2f;
+  margin-top: 12px;
+  font-weight: 500;
+}
+.auth-container button:not([type="submit"]) {
+  background: #e3f2fd;
+  color: #1976d2;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 1em;
+  font-weight: 500;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.auth-container button:not([type="submit"]):hover {
+  background: #bbdefb;
+}
+.oralvis-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  background: #e3f2fd;
+  padding: 10px 0;
+  border-bottom: 2px solid #90caf9;
+  font-size: 1.15em;
+  margin-bottom: 18px;
+}
+.nav-item {
+  color: #1976d2;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 6px 18px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.nav-item:hover {
+  background: #bbdefb;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(120deg, #e3f2fd 0%, #fff 100%);
+  margin: 0;
+}
+.oralvis-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1976d2;
+  color: #fff;
+  padding: 18px 0 12px 0;
+  border-bottom: 3px solid #1565c0;
+  font-size: 2em;
+  letter-spacing: 2px;
+}
+.oralvis-title {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 2.2em;
+  letter-spacing: 2px;
+}
+.oralvis-footer {
+  margin-top: 40px;
+  color: #1976d2;
+  font-size: 1.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.oralvis-home {
+  text-align: center;
+  margin-top: 60px;
+}
+.role-select {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+.dentist-btn {
+  background: linear-gradient(90deg, #1976d2 60%, #64b5f6 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 16px 44px;
+  font-size: 1.2em;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+}
+.dentist-btn:hover {
+  background: linear-gradient(90deg, #1565c0 60%, #42a5f5 100%);
+  transform: scale(1.04);
+}
+.oralvis-patient, .oralvis-admin {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 32px 24px;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(25,118,210,0.10);
+}
+.oralvis-patient h2, .oralvis-admin h2 {
+  color: #1976d2;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+}
+.patient-form label {
+  display: block;
+  margin-bottom: 18px;
+  font-weight: 500;
+  color: #1976d2;
+  font-size: 1.1em;
+}
+.input-details, .input-file {
+  display: block;
+  margin-top: 8px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #90caf9;
+  font-size: 1em;
+}
+.input-file {
+  background: #e3f2fd;
+}
+.submissions-list {
+  margin-top: 24px;
+}
+.submission-card {
+  background: #e3f2fd;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 6px rgba(25,118,210,0.07);
+}
+.submission-info {
+  flex: 1;
+  color: #1976d2;
+  font-size: 1.05em;
+}
+.submission-image img {
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(25,118,210,0.07);
+  border: 2px solid #1976d2;
+}
+.annotation-section {
+  margin-top: 28px;
+}
+.annotation-text {
+  width: 100%;
+  min-height: 60px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #90caf9;
+  margin-bottom: 12px;
+  font-size: 1em;
+}
+.report-link {
+  margin-top: 10px;
+}
