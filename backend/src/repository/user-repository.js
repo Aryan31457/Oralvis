@@ -59,9 +59,9 @@ class UserRepository extends CrudRepository {
 
     async verify(data) {
         try {
-            console.log(data.code);
+            console.log(data.verificationcode);
             const user = await User.findOne({
-                verificationcode: data.code
+                verificationcode: data.verificationcode
             });
 
             // If no user found or OTP doesn't match

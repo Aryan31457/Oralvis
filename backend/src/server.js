@@ -7,19 +7,9 @@ import cors from 'cors';
 
 const app = express();
 
-const allowedOrigins = [
-    config.ADMIN_URL,
-    config.FRONTEND_URL,
-];
-
+// Allow all origins for development
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    origin: true,
     credentials: true
 }));
 app.use(bodyParser.json());
@@ -27,7 +17,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api', router);
-app.use('/admin', adminRoutes);
 const setupandstartserver = async () => {
     try {
         await mongoose.connect(config.MONGODB_URL);

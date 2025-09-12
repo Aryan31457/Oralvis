@@ -2,9 +2,6 @@ import UserRepository from "../repository/user-repository.js";
 import jwt from "jsonwebtoken";
 import config from '../config/server-config.js'
 import tokenBlacklist from "../utils/token-blacklist.js";
-import { getNextMemberId } from '../utils/getNextMemberId.js';
-import { extractPublicIdFromUrl } from "../utils/cloudinary.js";
-import { v2 as cloudinary } from "cloudinary";
 import { sendForgotPasswordEmail } from "../utils/mailer.js";
 import bcrypt from "bcrypt";
 class UserService {
@@ -27,7 +24,6 @@ class UserService {
             if (user) {
                 throw new Error("Email has Been registered before");
             }
-            data.memberId = await getNextMemberId();
             const user1 = await this.userrepository.createuser(data);
             const payload = {
                 id: user1._id,
@@ -167,7 +163,7 @@ class UserService {
 
     async verify(data) {
         try {
-            console.log(data);
+            console.log("REQ.BODY:- ",data);
             const response = await this.userrepository.verify(data);
             console.log(response);
             return response;

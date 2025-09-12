@@ -14,8 +14,6 @@ const getAll = async (req, res) => {
     }
 }
 
-
-
 const signup = async (req, res) => {
     try {
         const { body } = req;

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaTooth, FaTeethOpen } from 'react-icons/fa';
 import axios from 'axios';
+import OtpVerification from './OtpVerification';
 
 const LoginSignup = ({ onAuth }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -9,6 +10,7 @@ const LoginSignup = ({ onAuth }) => {
   const [role, setRole] = useState('user');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+  const [showOtp, setShowOtp] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,13 +20,17 @@ const LoginSignup = ({ onAuth }) => {
         const res = await axios.post('http://localhost:5000/api/login', { email, password });
         onAuth(res.data.user, res.data.token);
       } else {
-        const res = await axios.post('http://localhost:5000/api/signup', { email, password, name, role });
-        onAuth(res.data.user1, res.data.token);
+        await axios.post('http://localhost:5000/api/signup', { email, password, name, role });
+        setShowOtp(true);
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Error occurred');
     }
   };
+
+  if (showOtp) {
+    return <OtpVerification email={email} onVerified={() => { setShowOtp(false); setIsLogin(true); window.location.reload(); }} />;
+  }
 
   return (
     <>

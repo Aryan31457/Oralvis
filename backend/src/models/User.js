@@ -16,11 +16,6 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    memberId: {
-        type: String,
-        required: true,
-        unique: true
-    },
     name: {
         type: String,
         required: true
@@ -46,17 +41,7 @@ const UserSchema = new mongoose.Schema({
     address: {
         type: String
     },
-    category: {
-        type: String,
-        enum: ['Recurve', 'Compound', 'Barebow']
-    },
     memberAssociation: {
-        type: String
-    },
-    photoUrl: {
-        type: String
-    },
-    signatureUrl: {
         type: String
     },
     isverified: {
