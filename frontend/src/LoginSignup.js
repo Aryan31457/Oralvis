@@ -3,6 +3,10 @@ import { FaTooth, FaTeethOpen } from 'react-icons/fa';
 import axios from 'axios';
 import OtpVerification from './OtpVerification';
 
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? window.location.origin 
+  : 'http://localhost:5000';
+
 const LoginSignup = ({ onAuth }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -17,10 +21,10 @@ const LoginSignup = ({ onAuth }) => {
     setError('');
     try {
       if (isLogin) {
-        const res = await axios.post('http://localhost:5000/api/login', { email, password });
+        const res = await axios.post(`${API_BASE_URL}/api/login`, { email, password });
         onAuth(res.data.user, res.data.token);
       } else {
-        await axios.post('http://localhost:5000/api/signup', { email, password, name, role });
+        await axios.post(`${API_BASE_URL}/api/signup`, { email, password, name, role });
         setShowOtp(true);
       }
     } catch (err) {
@@ -34,9 +38,9 @@ const LoginSignup = ({ onAuth }) => {
 
   return (
     <>
-      <header className="oralvis-header">
+      <header className="dentiva-header">
         <FaTooth size={48} style={{ color: '#1976d2', marginRight: 12 }} />
-        <span className="oralvis-title">ORALVIS</span>
+        <span className="dentiva-title">DENTIVA</span>
       </header>
       <div className="auth-container">
         <h2>{isLogin ? 'Login' : 'Sign Up'}</h2>
@@ -59,7 +63,7 @@ const LoginSignup = ({ onAuth }) => {
         </button>
         {error && <div className="error-msg">{error}</div>}
       </div>
-      <footer className="oralvis-footer">
+      <footer className="dentiva-footer">
         <FaTeethOpen size={32} style={{ color: '#1976d2', marginRight: 8 }} />
         <span>Oral Health. Simplified.</span>
       </footer>

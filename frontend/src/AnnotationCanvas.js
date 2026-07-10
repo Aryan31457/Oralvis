@@ -13,7 +13,7 @@ const tools = [
 ];
 const colors = ['#1976d2', '#d32f2f', '#388e3c', '#fbc02d', '#000', '#fff', '#e91e63', '#00bcd4', '#8bc34a', '#ff9800', '#795548', '#607d8b'];
 
-function AnnotationCanvas({ imageUrl, onSave }) {
+function AnnotationCanvas({ imageUrl, onSave, initialShapes }) {
   const canvasRef = useRef(null);
   const [tool, setTool] = useState('rectangle');
   const [color, setColor] = useState('#1976d2');
@@ -23,11 +23,18 @@ function AnnotationCanvas({ imageUrl, onSave }) {
   const [thickness, setThickness] = useState(2);
   const [textInput, setTextInput] = useState('');
 
+  React.useEffect(() => {
+    if (initialShapes) {
+      setShapes(initialShapes);
+    }
+  }, [initialShapes]);
+
   // Draw image and shapes
   React.useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const img = new window.Image();
+    img.crossOrigin = "anonymous";
     img.src = imageUrl;
     img.onload = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);

@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? window.location.origin 
+  : 'http://localhost:5000';
+
 const OtpVerification = ({ email, onVerified }) => {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
@@ -11,7 +15,7 @@ const OtpVerification = ({ email, onVerified }) => {
     setError('');
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/verifyemail', { email, verificationcode: otp });
+      const res = await axios.post(`${API_BASE_URL}/api/verifyemail`, { email, verificationcode: otp });
       if (res.data.success) {
         onVerified();
       } else {
