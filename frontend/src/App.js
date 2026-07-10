@@ -785,7 +785,7 @@ function App() {
                                   <div style={{ textAlign: 'center' }}>
                                     <small style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-light)', marginBottom: '2px' }}>Original</small>
                                     <img 
-                                      src={`${API_BASE_URL}/static_media/${sub.image}`} 
+                                      src={sub.image || ''} 
                                       alt="Original Teeth Scan" 
                                       width={100} 
                                       style={{ borderRadius: '6px', border: '1px solid var(--border)' }}
@@ -795,7 +795,7 @@ function App() {
                                   <div style={{ textAlign: 'center' }}>
                                     <small style={{ display: 'block', fontSize: '0.7rem', color: 'var(--primary)', marginBottom: '2px', fontWeight: 600 }}>Annotated</small>
                                     <img 
-                                      src={`${API_BASE_URL}/static_media/${sub.annotatedImage}`} 
+                                      src={sub.annotatedImage || ''} 
                                       alt="Annotated Teeth Scan" 
                                       width={100} 
                                       style={{ borderRadius: '6px', border: '2px solid var(--primary)' }}
@@ -805,7 +805,7 @@ function App() {
                                 </div>
                               ) : (
                                 <img 
-                                  src={`${API_BASE_URL}/static_media/${sub.image}`} 
+                                  src={sub.image || ''} 
                                   alt="Original Teeth Scan" 
                                   width={120} 
                                   style={{ borderRadius: '8px', border: '1px solid var(--border)' }}
@@ -1186,7 +1186,7 @@ function App() {
 
                           <div className="card-image-box">
                             <img 
-                              src={sub.image ? `${API_BASE_URL}/static_media/${sub.image}` : ''} 
+                              src={sub.image ? sub.image || '' : ''} 
                               alt="Scan Preview" 
                               onError={handleImageError}
                             />
@@ -1232,7 +1232,7 @@ function App() {
                             <span className="helper-label">(Use rectangle, circle, freehand, text, or brush overlays)</span>
                           </div>
                           <AnnotationCanvas
-                            imageUrl={selectedSubmission.image ? `${API_BASE_URL}/static_media/${selectedSubmission.image}` : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="400" height="400"><rect width="100" height="100" fill="%23ffffff"/><circle cx="50" cy="50" r="30" fill="%23f8fafc" stroke="%23cbd5e1" stroke-width="2"/><text x="50" y="55" font-family="sans-serif" font-size="5" text-anchor="middle" fill="%2364748b">No image uploaded. Use drawing tools to sketch layout.</text></svg>'}
+                            imageUrl={selectedSubmission.image || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="400" height="400"><rect width="100" height="100" fill="%23ffffff"/><circle cx="50" cy="50" r="30" fill="%23f8fafc" stroke="%23cbd5e1" stroke-width="2"/><text x="50" y="55" font-family="sans-serif" font-size="5" text-anchor="middle" fill="%2364748b">No image uploaded. Use drawing tools to sketch layout.</text></svg>'}
                             onSave={savingAnnotation ? () => {} : annotate}
                             initialShapes={aiShapes}
                           />
@@ -1297,7 +1297,7 @@ function App() {
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>1. Actual Image (Original Teeth Scan)</span>
                             <img 
-                              src={selectedSubmission.image ? `${API_BASE_URL}/static_media/${selectedSubmission.image}` : ''} 
+                              src={selectedSubmission.image || ''} 
                               alt="Original scan" 
                               onError={handleImageError} 
                               style={{ width: '400px', height: '400px', objectFit: 'fill', borderRadius: '12px', border: '2px solid var(--border)', marginTop: '56px' }} 
@@ -1306,7 +1306,7 @@ function App() {
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>2. AI Annotated Image (Interactive Workspace)</span>
                             <AnnotationCanvas
-                              imageUrl={selectedSubmission.image ? `${API_BASE_URL}/static_media/${selectedSubmission.image}` : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="400" height="400"><rect width="100" height="100" fill="%23ffffff"/><circle cx="50" cy="50" r="30" fill="%23f8fafc" stroke="%23cbd5e1" stroke-width="2"/><text x="50" y="55" font-family="sans-serif" font-size="5" text-anchor="middle" fill="%2364748b">No image uploaded. Use drawing tools to sketch layout.</text></svg>'}
+                              imageUrl={selectedSubmission.image || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="400" height="400"><rect width="100" height="100" fill="%23ffffff"/><circle cx="50" cy="50" r="30" fill="%23f8fafc" stroke="%23cbd5e1" stroke-width="2"/><text x="50" y="55" font-family="sans-serif" font-size="5" text-anchor="middle" fill="%2364748b">No image uploaded. Use drawing tools to sketch layout.</text></svg>'}
                               onSave={savingAnnotation ? () => {} : annotate}
                               initialShapes={aiShapes}
                             />
@@ -1593,7 +1593,7 @@ function App() {
                               <div style={{ textAlign: 'center' }}>
                                 <small style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-light)', marginBottom: '2px' }}>Original</small>
                                 <img 
-                                  src={`${API_BASE_URL}/static_media/${patient.image}`} 
+                                  src={patient.image || ''} 
                                   alt="Original" 
                                   width={80} 
                                   style={{ borderRadius: '6px', border: '1px solid var(--border)' }}
@@ -1604,7 +1604,7 @@ function App() {
                                 <div style={{ textAlign: 'center' }}>
                                   <small style={{ display: 'block', fontSize: '0.7rem', color: 'var(--primary)', marginBottom: '2px', fontWeight: 600 }}>Annotated</small>
                                   <img 
-                                    src={`${API_BASE_URL}/static_media/${patient.annotatedImage}`} 
+                                    src={patient.annotatedImage || ''} 
                                     alt="Annotated" 
                                     width={80} 
                                     style={{ borderRadius: '6px', border: '2px solid var(--primary)' }}

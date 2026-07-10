@@ -114,7 +114,8 @@ const appointments = [
   }
 ];
 
-const upload = multer({ dest: 'static_media/' });
+const upload = multer({ storage: multer.memoryStorage() });
+const pdfStore = {}; // In-memory PDF storage { submissionId: Buffer }
 
 // Auth: Signup
 app.post('/api/signup', (req, res) => {
@@ -214,13 +215,15 @@ app.post('/api/submit', upload.any(), (req, res) => {
   }
 
   const newSubmissions = req.files.map((file, index) => {
+    const mimeType = file.mimetype || 'image/jpeg';
+    const dataUrl = `data:${mimeType};base64,${file.buffer.toString('base64')}`;
     return {
       _id: (Date.now() + index).toString(),
       name,
       patientId,
       email,
       note: note || '',
-      image: file.filename,
+      image: dataUrl,  // stored as base64 data URL in memory
       status: 'uploaded',
       annotation: '',
       report: ''
@@ -278,23 +281,17 @@ app.post('/api/annotate/:id', (req, res) => {
   submission.carePlan = carePlan || '';
   submission.medications = medications || '';
 
-  // Save annotated image (base64 PNG)
+  // Store annotated image as base64 data URL in memory (no disk write needed)
   if (annotatedImage) {
-    try {
-      const base64Data = annotatedImage.replace(/^data:image\/png;base64,/, "");
-      const annotatedPath = path.join(staticMediaDir, `annotated_${submission._id}.png`);
-      fs.writeFileSync(annotatedPath, base64Data, 'base64');
-      submission.annotatedImage = `annotated_${submission._id}.png`;
-    } catch (err) {
-      console.error('Error saving annotated image:', err);
-    }
+    submission.annotatedImage = annotatedImage;
   }
 
-  // Generate PDF report
+  // Generate PDF report in memory
   const doc = new PDFDocument();
   const pdfFilename = `report_${submission._id}.pdf`;
-  const pdfPath = path.join(staticMediaDir, pdfFilename);
-  doc.pipe(fs.createWriteStream(pdfPath));
+  const pdfChunks = [];
+  doc.on('data', chunk => pdfChunks.push(chunk));
+  doc.on('end', () => { pdfStore[submission._id] = Buffer.concat(pdfChunks); });
 
   // Title
   doc.fontSize(24).fillColor('#1976d2').text('Dentiva Report', { align: 'center' });
@@ -308,29 +305,23 @@ app.post('/api/annotate/:id', (req, res) => {
   doc.moveDown();
 
   // Images Section
-  if (submission.image) {
+  if (submission.image && submission.image.startsWith('data:')) {
     doc.fontSize(16).fillColor('#1976d2').text('Original Image', { align: 'center' });
     doc.moveDown(0.5);
     try {
-      doc.image(path.join(staticMediaDir, submission.image), {
-        fit: [300, 200],
-        align: 'center',
-        valign: 'center'
-      });
+      const imgBuf = Buffer.from(submission.image.replace(/^data:[^;]+;base64,/, ''), 'base64');
+      doc.image(imgBuf, { fit: [300, 200], align: 'center', valign: 'center' });
     } catch (e) {
       console.error('Error adding original image to PDF', e);
     }
     doc.moveDown();
   }
-  if (submission.annotatedImage) {
+  if (submission.annotatedImage && submission.annotatedImage.startsWith('data:')) {
     doc.fontSize(16).fillColor('#1976d2').text('Annotated Image', { align: 'center' });
     doc.moveDown(0.5);
     try {
-      doc.image(path.join(staticMediaDir, submission.annotatedImage), {
-        fit: [300, 200],
-        align: 'center',
-        valign: 'center'
-      });
+      const annBuf = Buffer.from(submission.annotatedImage.replace(/^data:[^;]+;base64,/, ''), 'base64');
+      doc.image(annBuf, { fit: [300, 200], align: 'center', valign: 'center' });
     } catch (e) {
       console.error('Error adding annotated image to PDF', e);
     }
@@ -373,27 +364,21 @@ app.post('/api/annotate/:id', (req, res) => {
   res.json({ success: true, report: submission.report });
 });
 
-// Serve PDF
+// Serve PDF from in-memory store
 app.get('/api/report/:id', (req, res) => {
   const submission = submissions.find(s => s._id === req.params.id);
   if (!submission || !submission.report) return res.status(404).json({ error: 'Not found' });
-  res.sendFile(path.join(staticMediaDir, submission.report));
+  const pdfBuffer = pdfStore[submission._id];
+  if (!pdfBuffer) return res.status(404).json({ error: 'PDF not yet generated' });
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `inline; filename="${submission.report}"`);
+  res.send(pdfBuffer);
 });
 
-// Helper to detect image mimetype from binary signature
-function getMimeType(filePath) {
-  try {
-    const buffer = fs.readFileSync(filePath);
-    if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47) {
-      return 'image/png';
-    }
-    if (buffer[0] === 0xFF && buffer[1] === 0xD8) {
-      return 'image/jpeg';
-    }
-  } catch (e) {
-    console.error('Error reading file mimetype:', e);
-  }
-  return 'image/png'; // Default fallback
+// Helper to extract mime type from a base64 data URL
+function getMimeTypeFromDataUrl(dataUrl) {
+  const match = dataUrl && dataUrl.match(/^data:([^;]+);base64,/);
+  return match ? match[1] : 'image/jpeg';
 }
 
 // Admin: AI Auto-Diagnose using Google Gemini
@@ -404,8 +389,7 @@ app.post('/api/submissions/:id/ai-diagnose', async (req, res) => {
   const apiKey = process.env.GEMINI_API_KEY;
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-  const imagePath = submission.image ? path.join(staticMediaDir, submission.image) : '';
-  const hasImageFile = imagePath && fs.existsSync(imagePath);
+  const hasImageFile = submission.image && submission.image.startsWith('data:');
 
   if (!hasImageFile) {
     let findings = "AI detected potential issues based on patient symptoms. Visual inspection indicates mild plaque accumulation.";
@@ -448,8 +432,8 @@ app.post('/api/submissions/:id/ai-diagnose', async (req, res) => {
   }
 
   try {
-    const base64Data = fs.readFileSync(imagePath).toString('base64');
-    const detectedMimeType = getMimeType(imagePath);
+    const base64Data = submission.image.replace(/^data:[^;]+;base64,/, '');
+    const detectedMimeType = getMimeTypeFromDataUrl(submission.image);
     
     const payload = {
       contents: [
@@ -541,14 +525,13 @@ app.post('/api/submissions/:id/ai-diagnose', async (req, res) => {
 });
 
 function ensureMockData() {
-  if (!fs.existsSync(staticMediaDir)) {
-    fs.mkdirSync(staticMediaDir, { recursive: true });
-  }
-  const reportPath = path.join(staticMediaDir, 'report_sub_3.pdf');
-  if (!fs.existsSync(reportPath)) {
+  // Generate mock PDF for alice's pre-seeded submission (sub_3) in memory
+  if (!pdfStore['sub_3']) {
     try {
       const doc = new PDFDocument();
-      doc.pipe(fs.createWriteStream(reportPath));
+      const chunks = [];
+      doc.on('data', chunk => chunks.push(chunk));
+      doc.on('end', () => { pdfStore['sub_3'] = Buffer.concat(chunks); console.log('Mock report for sub_3 generated in memory.'); });
       doc.fontSize(24).fillColor('#1976d2').text('Dentiva Report', { align: 'center' });
       doc.moveDown(1.5);
       doc.fontSize(14).fillColor('#333').text('Name: Alice Cooper');
@@ -561,17 +544,14 @@ function ensureMockData() {
       doc.fontSize(12).fillColor('#333');
       doc.text('■ Inflammed or Red gums : Scaling.', { continued: true }).fillColor('#800000').text('');
       doc.moveDown();
-
       doc.fontSize(16).fillColor('#1976d2').text('SUGGESTED CARE PLAN:', { underline: true });
       doc.moveDown(0.5);
       doc.fontSize(12).fillColor('#333').text('Brush twice daily using desensitizing toothpaste. Avoid carbonated or highly acidic drinks for 2 weeks. Schedule follow-up in 3 months.');
       doc.moveDown();
-
       doc.fontSize(16).fillColor('#1976d2').text('RECOMMENDED MEDICATIONS:', { underline: true });
       doc.moveDown(0.5);
       doc.fontSize(12).fillColor('#333').text('Sensodyne Rapid Relief Toothpaste (use daily), Chlorhexidine mouthwash (rinse twice daily for 7 days)');
       doc.end();
-      console.log('Mock report report_sub_3.pdf generated.');
     } catch (err) {
       console.error('Failed to generate mock report:', err);
     }
